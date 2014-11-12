@@ -9,22 +9,26 @@ Optional parameter `data` in `logic::Parser::Parse` is used for debugging purpos
 
 `logic::Expression` objects support the following methods:
 
-- ```cpp
+-
+  ```cpp
   bool Evaluate(const map<string, bool>&) const;
   ```
 
   Evaluates the expression with the given context.
-- ```cpp
+-
+  ```cpp
   void ToString(ostream&) const;
   ```
 
   Sends the string representation to the output stream.
-- ```cpp
+-
+  ```cpp
   unique_ptr<logic::Expression> Clone() const;
   ```
 
   Returns a deep copy of an object.
-- ```cpp
+-
+  ```cpp
   void Traverse(logic::Visitor*) const;
   ```
 
