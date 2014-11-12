@@ -1,4 +1,4 @@
-To get the parsing tree (a `logic::Expression` object) you are to do as following:
+To get the parsing tree (a `unique_ptr<logic::Expression>` object) you are to do as following:
 
 ```cpp
 auto tokens = logic::Lexer(data, size).Tokenize();
@@ -33,4 +33,4 @@ There are two built-in visitors:
   Has a method `GetResult() -> vector<const logic::Expression*>` that returns all the subexpressions
   (without repetitions).
 
-For more information see file `main.cpp`.
+For more information, see file `main.cpp`.
