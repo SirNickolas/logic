@@ -44,7 +44,7 @@ namespace {
     import "token_id.h";
     access _;
     variable p _p;
-    getkey _p->id;
+    getkey fpc->id;
 
     prepush {
         _stack.emplace_back();
