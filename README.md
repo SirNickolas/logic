@@ -1,6 +1,6 @@
 To get the parsing tree (a `logic::Expression` object) you are to do as following:
 
-```
+```cpp
 auto tokens = logic::Lexer(data, size).Tokenize();
 auto expression = logic::Parser(tokens.data()).Parse(/*data*/);
 ```
