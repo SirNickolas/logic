@@ -12,12 +12,36 @@ using namespace std;
 
 const short MAX_VARIABLES = 31;
 
+class OpCountVisitor: public logic::Visitor {
+public:
+    void Visit(const logic::Expression* e) {
+        if (dynamic_cast<const logic::Operator*>(e))
+            _count++;
+    }
+
+    size_t GetCount() const { return _count; }
+
+private:
+    size_t _count = 0;
+};
+
 int main() {
     string s;
     getline(cin, s);
 
-    auto tokens = logic::Lexer(s.c_str(), s.length()).Tokenize();
-    auto expr = logic::Parser(tokens.data()).Parse(s.c_str());
+    unique_ptr<logic::Expression> expr;
+    try {
+        auto tokens = logic::Lexer(s.c_str(), s.length()).Tokenize();
+        expr = logic::Parser(tokens.data()).Parse(s.c_str());
+    }
+    catch (logic::LexicalError&) {
+        cerr << "Lexical error\n";
+        return 1;
+    }
+    catch (logic::SyntaxError&) {
+        cerr << "Syntax error\n";
+        return 1;
+    }
 
     logic::DependencyVisitor dVisitor;
     expr->Traverse(&dVisitor);
@@ -37,7 +61,10 @@ int main() {
         }
     ), end(subsets));
 
-    cout << endl;
+    OpCountVisitor cVisitor;
+    expr->Traverse(&cVisitor);
+    cout << endl << cVisitor.GetCount() << " operations\n";
+
     for (size_t i = 0; i < subsets.size(); i++) {
         cout << 'F' << i + 1 << " = ";
         subsets[i]->ToString(cout);
