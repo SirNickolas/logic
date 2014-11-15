@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include "gray/for_each.h"
 #include "logic/lexer.h"
 #include "logic/parser.h"
 #include "logic/dependency_visitor.h"
@@ -72,7 +73,6 @@ int main() {
     }
     cout << endl;
 
-    //Generating table with Gray code.
     vector<vector<bool>> table(
         1LL << deps.size(),
         vector<bool>(deps.size() + subsets.size())
@@ -80,30 +80,27 @@ int main() {
     map<string, bool> context;
     for (const string& var: deps)
         context.emplace(var, 0);
-    size_t j = deps.size();
-    for (auto e: subsets)
-        table[0x0][j++] = e->Evaluate(context);
     bitset<MAX_VARIABLES> mask;
-    for (size_t i = 0x1; i < 1LL << deps.size(); i++) {
-        size_t x = i, pos = 0;
-        while (!(x & 0x1)) {
-            x >>= 1;
-            pos++;
+    gray::ForEach(deps.size(),
+        [&](int bit) {
+            if (bit != -1) {
+                mask.flip(bit);
+                context.find(deps[bit])->second ^= true;
+            }
+            auto pos = mask.to_ulong();
+            size_t i;
+            for (i = 0; i < deps.size(); i++)
+                table[pos][i] = mask[deps.size() - i - 1];
+            for (auto e: subsets)
+                table[pos][i++] = e->Evaluate(context);
         }
-        mask.flip(pos);
-        context.find(deps[pos])->second ^= true;
-        pos = mask.to_ulong();
-        for (j = 0; j < deps.size(); j++)
-            table[pos][j] = mask[deps.size() - j - 1];
-        for (auto e: subsets)
-            table[pos][j++] = e->Evaluate(context);
-    }
+    );
 
     for_each(deps.rbegin(), deps.rend(),
         [ ](const string& var) { cout << var << '\t'; }
     );
-    for (j = 1; j <= subsets.size(); j++)
-        cout << 'F' << j << '\t';
+    for (size_t i = 1; i <= subsets.size(); i++)
+        cout << 'F' << i << '\t';
     cout << endl;
     for (const auto& row: table) {
         for (auto b: row)
